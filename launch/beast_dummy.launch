@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+  <group ns="beast">
+    <node pkg="beast" type="dummy_handle.py" name="handle" output="screen"/>
+    <node pkg="beast" type="dummy_trolley.py" name="trolley" output="screen"/>
+  </group>
+
+</launch>
