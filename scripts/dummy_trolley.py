@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import random
 
 import numpy as np
 import rospy
@@ -7,13 +6,7 @@ from std_msgs.msg import Float32, Header
 
 from sensor_msgs.msg import LaserScan
 
-from beast_msgs.msg import *
 from beast_srvs.srv import *
-
-
-def set_stiffness(req):
-    print "SetStiffnessRequest(stiffness: {})".format(req.stiffness)
-    return SetStiffnessResponse(True, "Dummy response")
 
 
 def set_left_wheel_braking_mode(req):
@@ -44,6 +37,12 @@ def set_left_wheel_braking_lut(req):
     print "set_left_wheel_braking_lut:"
     print req
     return SetWheelBrakingLUTResponse(True, "Dummy response")
+
+
+def reset_encoders(req):
+    print "reset_encoders:"
+    print req
+    return ResetEncodersResponse(True, "Dummy response")
 
 
 def set_right_wheel_braking_lut(req):
@@ -80,19 +79,19 @@ def publish_scan(scan_pub):
 def main():
     rospy.init_node('trolley')
 
-    rospy.Service('~set_stiffness', SetStiffness, set_stiffness)
+    rospy.Service('left/set_wheel_braking_mode', SetWheelBrakingMode, set_left_wheel_braking_mode)
+    rospy.Service('right/set_wheel_braking_mode', SetWheelBrakingMode, set_right_wheel_braking_mode)
 
-    rospy.Service('/left/set_wheel_braking_mode', SetWheelBrakingMode, set_left_wheel_braking_mode)
-    rospy.Service('/right/set_wheel_braking_mode', SetWheelBrakingMode, set_right_wheel_braking_mode)
+    rospy.Service('left/set_wheel_braking', SetWheelBraking, set_left_wheel_braking)
+    rospy.Service('right/set_wheel_braking', SetWheelBraking, set_right_wheel_braking)
 
-    rospy.Service('/left/set_wheel_braking', SetWheelBraking, set_left_wheel_braking)
-    rospy.Service('/right/set_wheel_braking', SetWheelBraking, set_right_wheel_braking)
+    rospy.Service('left/set_wheel_braking_lut', SetWheelBrakingLUT, set_left_wheel_braking_lut)
+    rospy.Service('right/set_wheel_braking_lut', SetWheelBrakingLUT, set_right_wheel_braking_lut)
 
-    rospy.Service('/left/set_wheel_braking_lut', SetWheelBrakingLUT, set_left_wheel_braking_lut)
-    rospy.Service('/right/set_wheel_braking_lut', SetWheelBrakingLUT, set_right_wheel_braking_lut)
+    rospy.Service('reset_encoders', ResetEncoders, reset_encoders)
 
-    rospy.Subscriber('/left/braking', Float32, left_braking_sub)
-    rospy.Subscriber('/right/braking', Float32, right_braking_sub)
+    rospy.Subscriber('left/braking', Float32, left_braking_sub)
+    rospy.Subscriber('right/braking', Float32, right_braking_sub)
 
     scan_pub = rospy.Publisher('/scan', LaserScan, queue_size=1)
 
